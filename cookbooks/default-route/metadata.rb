@@ -1,0 +1,7 @@
+name 'default-route'
+maintainer 'The Authors'
+maintainer_email 'you@example.com'
+license 'all_rights'
+description 'Installs/Configures default-route'
+long_description 'Installs/Configures default-route'
+version '0.1.0'
