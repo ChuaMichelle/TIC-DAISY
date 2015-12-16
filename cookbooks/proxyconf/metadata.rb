@@ -1,0 +1,7 @@
+name 'proxyconf'
+maintainer 'The Authors'
+maintainer_email 'you@example.com'
+license 'all_rights'
+description 'Installs/Configures proxyconf'
+long_description 'Installs/Configures proxyconf'
+version '0.1.0'
