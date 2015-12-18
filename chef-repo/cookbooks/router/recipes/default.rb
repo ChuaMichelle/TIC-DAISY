@@ -1,0 +1,19 @@
+#
+# Cookbook Name:: router
+# Recipe:: default
+#
+# Copyright (c) 2015 The Authors, All Rights Reserved.
+
+execute 'ip_forward' do
+  command '/etc/network/if-up.d/iptables'
+  action :nothing
+end
+
+template '/etc/network/if-up.d/iptables' do
+  source 'iptables'
+  owner 'root'
+  group 'root'
+  mode '0755'
+  notifies :run, 'execute[ip_forward]', :immediately
+end
+

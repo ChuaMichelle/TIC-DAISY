@@ -1,0 +1,7 @@
+name 'router'
+maintainer 'The Authors'
+maintainer_email 'you@example.com'
+license 'all_rights'
+description 'Installs/Configures router'
+long_description 'Installs/Configures router'
+version '0.1.0'

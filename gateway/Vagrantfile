@@ -6,12 +6,12 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 
-app_vm_name = "Web1"
-app_name = "Web1"
-app_ip = "192.168.110.2"
+GATEWAY = exec 'netstat -rn | grep 192.168 | grep default | tr -s " " | cut -d" " -f 2'
+
+app_vm_name = "gateway"
+app_name = "gateway"
+app_ip = "192.168.11O.5"
 app_netmask = "255.255.255.0"
-app_ip_gateway = "192.168.110.5"
-app_docroot = "./web1_docroot"
 
 Vagrant.configure(2) do |config|
   # The most common configuration options are documented and commented below.
@@ -21,28 +21,27 @@ Vagrant.configure(2) do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "deimosfr/debian-wheezy"
-  config.vm.define app_name
+
+  # config.vm.define app_name
   config.vm.provider :virtualbox do |vb|
     vb.name = app_vm_name
   end
-
-  config.vm.hostname = app_name
-  config.vm.synced_folder app_docroot, "/var/www", :mount_options => ["dmode=777", "fmode=666"]
-
-  config.vm.network "private_network", ip: app_ip, netmask: app_netmask
   
-  config.vm.provision :chef_solo do |chef|
+  config.vm.hostname = app_name
+  config.vm.network "private_network", ip: app_ip, netmask: app_netmask
+  config.vm.network "public_network"
+
+  config.vm.provision "chef_solo" do |chef|
     chef.cookbooks_path = "../chef-repo/cookbooks"
     chef.roles_path = "../chef-repo/roles"
     chef.json = {
-      :route => { 
-        :apache => {
-          :default_site_enabled => true
-        },
-        :ip_gateway => app_ip_gateway
+      :route => {
+        :ip_gateway => GATEWAY,
+        :device => "eth2"
       }
     }
-    chef.add_role("web-server")
+    chef.add_recipe "default-route"
+    chef.add_role("gateway")
   end
 
   # Disable automatic box update checking. If you disable this, then
@@ -95,7 +94,7 @@ Vagrant.configure(2) do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   sudo apt-get update
+  # config.vm.provision "shell", inline <<-SHELL
+  #   sudo apt-get install apache2
   # SHELL
 end

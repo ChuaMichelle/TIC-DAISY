@@ -1,0 +1,33 @@
+#!/bin/sh
+
+PATH=/usr/sbin:/sbin:/bin:/usr/bin
+
+lan="eth1"
+web="eth2"
+
+# Restart iptables
+iptables -F
+iptables -t nat -F
+iptables -t mangle -F
+iptables -X
+
+# Accept loopback connections
+iptables -A INPUT -i lo -j ACCEPT
+
+# Accept connections that are not coming from outside
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -m state --state NEW ! -i "$web" -j ACCEPT
+iptables -A FORWARD -i "$web" -o "$lan" -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -i "$lan" -p tcp --dport 80 -d 192.168.254.250 -j ACCEPT
+
+# Accept connections connecting outside via LAN
+iptables -A FORWARD -i "$lan" -o "$web" -j ACCEPT
+
+# Masquerade
+iptables -t nat -A POSTROUTING -o "$web" -j MASQUERADE
+
+# Reject forwards from outside going inside
+iptables -A FORWARD -i "$web" -o "$web" -j REJECT
+
+# Enable routing
+echo 1 > /proc/sys/net/ipv4/ip_forward

@@ -1,0 +1,17 @@
+{
+    "name": "web-server",
+    "chef_type": "role",
+    "json_class": "Chef::Role",
+    "default_attributes": {
+      "apache": {
+        "default_site_enabled": true
+      }
+    },
+    "override_attributes": {
+    },
+    "run_list": [
+        "recipe[apt]",
+        "recipe[apache2]",
+        "recipe[default-route]"
+    ]
+}
